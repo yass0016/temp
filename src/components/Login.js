@@ -1,20 +1,23 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { ScrollView, Text, TextInput, View, Button, TouchableOpacity, StyleSheet } from "react-native";
-import { login } from "../redux/actions/auth";
+import { login, emailChanged, passwordChanged } from "../redux/actions/auth";
 
 class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: "",
-      password: ""
-    };
+  onEmailChanged(email) {
+    this.props.emailChanged(email);
   }
 
-  userLogin(e) {
-    this.props.login(this.state.username, this.state.password);
-    e.preventDefault();
+  onPasswordChanged(password) {
+    this.props.passwordChanged(password);
+  }
+
+  userLogin() {
+    let auth = {
+      email: this.props.email,
+      password: this.props.password
+    };
+    this.props.login(auth.email, auth.password);
   }
 
   render() {
@@ -27,23 +30,28 @@ class Login extends Component {
           keyboardType="email-address"
           returnKeyType="next"
           placeholder="Email"
-          onChangeText={(text) => this.setState({ username: text })}
+          onChangeText={this.onEmailChanged.bind(this)}
+          value={this.props.email}
         />
 
         <TextInput
           style={styles.input}
           placeholder="Password"
           secureTextEntry
-          onChangeText={(text) => this.setState({ password: text })}
+          onChangeText={this.onPasswordChanged.bind(this)}
+          value={this.props.password}
         />
 
         <TouchableOpacity
           style={styles.buttonContainer}
-          onPress={e => this.userLogin(e)}
+          onPress={this.userLogin.bind(this)}
           title="Login"
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+
+        <Text>{this.props.error}</Text>
+
       </ScrollView>
     );
   }
@@ -51,15 +59,9 @@ class Login extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    isLoggedIn: state.auth.isLoggedIn
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    login: (username, password) => {
-      dispatch(login(username, password));
-    }
+    email: state.auth.email,
+    password: state.auth.password,
+    error: state.auth.error
   };
 };
 
@@ -85,4 +87,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, { emailChanged, passwordChanged, login })(Login);

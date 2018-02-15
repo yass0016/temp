@@ -49,6 +49,7 @@ class FeatherService {
   }
 
   login(email, password) {
+    console.log(email);
     const payload = {
       strategy: "local",
       email,
@@ -59,10 +60,10 @@ class FeatherService {
 
   authenticate(options) {
     options = options ? options : undefined;
+    console.log(options);
     return this._authenticate(options)
       .then(user => {
         console.log("authenticated successfully", user._id, user.email);
-        this.user = user;
         return Promise.resolve(user);
       })
       .catch(error => {
@@ -73,6 +74,7 @@ class FeatherService {
   }
 
   _authenticate(payload) {
+    console.log(payload);
     return this.app
       .authenticate(payload)
       .then(response => {
@@ -85,10 +87,12 @@ class FeatherService {
   }
 
   createAccount(firstname, lastname, email, password) {
-    const userData = {firstname, lastname, email, password};
-    return this.app.service('users').create(userData).then((result) => {
-      return this.authenticate(Object.assign(userData, {strategy: 'local'}))
-    });
+    const userData = { firstname, lastname, email, password };
+    return this.app.service('users').create(userData);
+  }
+
+  logout() {
+    return this.app.logout();
   }
 }
 

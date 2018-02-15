@@ -1,20 +1,19 @@
-import React from "react";
+import React, { Component } from "react";
 import { View } from "react-native";
-import { Provider } from "react-redux";
+import { Provider, connect } from "react-redux";
 
-import store from "./redux";
-
-import Login from './components/Login';
-import Register from './components/Register'
+import { store, persistor } from "./redux";
+import Navigation from './components/Navigation';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const App = () => {
   return (
     <Provider store={store}>
-      <View style={{ flex: 1 }}>
-        <Register />
-      </View>
+      <PersistGate loading={null} persistor={persistor}>
+        <Navigation />
+      </PersistGate>
     </Provider>
-  );
-};
+  )
+}
 
 export default App;

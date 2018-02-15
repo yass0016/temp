@@ -9,28 +9,36 @@ import {
   TouchableOpacity,
   StyleSheet
 } from "react-native";
-import { signup } from "../redux/actions/auth";
+import { signup, firstNameChanged, lastNameChanged, emailChanged, passwordChanged } from "../redux/actions/auth";
 
 class Register extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      firstname: "",
-      lastname: "",
-      username: "",
-      password: ""
-    };
+
+  onFirstNameChanged(firstname) {
+    this.props.firstNameChanged(firstname);
   }
 
-  userRegister(e) {
-    this.props.signup(
-      this.state.firstname,
-      this.state.lastname,
-      this.state.username,
-      this.state.password
-    );
-    e.preventDefault();
+  onLastNameChanged(lastname) {
+    this.props.lastNameChanged(lastname);
   }
+
+  onEmailChanged(email) {
+    this.props.emailChanged(email);
+  }
+
+  onPasswordChanged(password) {
+    this.props.passwordChanged(password);
+  }
+
+  userRegister() {
+    let auth = {
+      firstname: this.props.firstname,
+      lastname: this.props.lastname,
+      email: this.props.email,
+      password: this.props.password
+    };
+
+    this.props.signup(auth);
+  };
 
   render() {
     return (
@@ -42,7 +50,8 @@ class Register extends Component {
           keyboardType="name-phone-pad"
           returnKeyType="next"
           placeholder="First Name"
-          onChangeText={text => this.setState({ firstname: text })}
+          onChangeText={this.onFirstNameChanged.bind(this)}
+          value={this.props.firstname}
         />
 
         <TextInput
@@ -52,7 +61,8 @@ class Register extends Component {
           keyboardType="name-phone-pad"
           returnKeyType="next"
           placeholder="Last Name"
-          onChangeText={text => this.setState({ lastname: text })}
+          onChangeText={this.onLastNameChanged.bind(this)}
+          value={this.props.lastname}
         />
 
         <TextInput
@@ -62,39 +72,40 @@ class Register extends Component {
           keyboardType="email-address"
           returnKeyType="next"
           placeholder="Email"
-          onChangeText={text => this.setState({ username: text })}
+          onChangeText={this.onEmailChanged.bind(this)}
+          value={this.props.email}
         />
 
         <TextInput
           style={styles.input}
           placeholder="Password"
           secureTextEntry
-          onChangeText={text => this.setState({ password: text })}
+          onChangeText={this.onPasswordChanged.bind(this)}
+          value={this.props.password}
         />
 
         <TouchableOpacity
           style={styles.buttonContainer}
-          onPress={e => this.userRegister(e)}
+          onPress={this.userRegister.bind(this)}
           title="Register"
         >
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+
+        <Text>{this.props.error}</Text>
       </ScrollView>
     );
   }
 }
 
+
 const mapStateToProps = (state, ownProps) => {
   return {
-    isLoggedIn: state.auth.isLoggedIn
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    signup: (firstname, lastname, username, password) => {
-      dispatch(signup(firstname, lastname, username, password));
-    }
+    firstname: state.auth.firstname,
+    lastname: state.auth.lastname,
+    email: state.auth.email,
+    password: state.auth.password,
+    error: state.auth.error
   };
 };
 
@@ -120,4 +131,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register);
+export default connect(mapStateToProps, { firstNameChanged, lastNameChanged, emailChanged, passwordChanged, signup })(Register);
